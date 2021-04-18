@@ -22,6 +22,9 @@
     <Reference Include="DotNetty.Buffers">
       <HintPath>..\Lib\DotNetty.Buffers.dll</HintPath>
     </Reference>
+    <Reference Include="DotNetty.Common">
+      <HintPath>..\Lib\DotNetty.Common.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>
