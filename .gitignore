@@ -1,0 +1,5 @@
+./src/bin
+./src/obj
+./Test/bin
+./Test/obj
+./Test/ByteStreamTest.csproj.user
