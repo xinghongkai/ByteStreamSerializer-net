@@ -6,14 +6,14 @@ a tool to serialize &amp; deserialize custom tcp byte stream based on Attribute 
 
 
 
-A Hello World Example
+# A Hello World Example
 
 
-# 1, define a byte stream
+## 1, define a byte stream
         head                result    
          4B                  1B
          int                 bool   
-# 2, define a class
+## 2, define a class
 ~~~
 pulic class HelloWorld
 {    
@@ -27,7 +27,7 @@ pulic class HelloWorld
 ~~~
   
   
-# 3, assembl a  byte stream
+## 3, assembl a  byte stream
 ~~~
 PooledByteBufferAllocator pbba = new PooledByteBufferAllocator();
 IByteBuffer bf = pbba.CompositeBuffer();
@@ -35,7 +35,7 @@ bf.WriteInt(21);
 bf.WriteBoolean(true);
 ~~~
 
-# 4, Deserialize
+## 4, Deserialize
 ~~~
 HelloWorld sdt = ByteStreamToObjectConverter.Deserialize<HelloWorld>(bf);
 
