@@ -35,7 +35,7 @@ bf.WriteInt(21);
 bf.WriteBoolean(true);
 ~~~
 
-## 4, Deserialize
+## 4, deserialize
 ~~~
 HelloWorld sdt = ByteStreamToObjectConverter.Deserialize<HelloWorld>(bf);
 
