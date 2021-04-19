@@ -10,7 +10,7 @@ a tool to serialize &amp; deserialize custom tcp byte stream based on Attribute 
 
 # 1, define a byte stream
      head                result    
-  int - 4bytes         bool - 1byte
+    int - 4bytes         bool - 1byte
 # 2, define a class
 
 ~~~
