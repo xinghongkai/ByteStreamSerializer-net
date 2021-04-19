@@ -12,7 +12,7 @@ namespace Nuctech.NIS.ByteStream.Serializer
         AttributeTargets.Class | 
         AttributeTargets.Method |
         AttributeTargets.Field,
-        AllowMultiple = true)]
+        AllowMultiple = false)]
     public class ByteStreamParserAttribute: Attribute
     {
         private bool  bHead;

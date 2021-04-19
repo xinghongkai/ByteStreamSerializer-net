@@ -29,6 +29,7 @@ namespace Nuctech.NIS.Service.DeviceAccess.ETD
     [ByteStreamParser(FieldType.Field_Class)]
     public class TRPackage
     {
+        private static uint s_package_id = 0;
         public TRPackage() { }
         public TRPackage(IByteBuffer nettybytes)
         {
@@ -36,7 +37,7 @@ namespace Nuctech.NIS.Service.DeviceAccess.ETD
         }
         // 包分隔符，用于字节流截断
         [ByteStreamParser(FieldType.Field_Ushort, FieldType.Field_Ushort_Len, true)]
-        public ushort delimiter = 0;//0xEFEF;
+        public ushort delimiter = 0xEFEF;
         /*
          * 0x00000000~0xFFFFFFFF循环
          * 说明：
@@ -48,7 +49,7 @@ namespace Nuctech.NIS.Service.DeviceAccess.ETD
          * 5、数据包ID的使用在各项目中可根据情况自行约定。不强制要求。但最后遵循以上原则。
          * */
         [ByteStreamParser(FieldType.Field_UInt, FieldType.Field_UInt_Len)]
-        public uint packageid = 0;
+        public uint packageid = s_package_id++;
 
         /*
          * 数据包标识由通讯双方约定。除常用系统指令外，其他指令均可使用。
@@ -56,26 +57,26 @@ namespace Nuctech.NIS.Service.DeviceAccess.ETD
          * 则返回数据包的标识应与请求标识一致
          * */
         [ByteStreamParser(FieldType.Field_Ushort, FieldType.Field_Ushort_Len)]
-        public ushort identifier = 0;// CommandIdentifier.None;
+        public ushort identifier = (ushort)CommandIdentifier.Hello;
 
         /*
          * 数据内容长度=内容标识（2字节）+内容长度（4字节）+内容
          */
 
         [ByteStreamParser(FieldType.Field_Int, FieldType.Field_Int_Len)]
-        public int data_len = 0;
+        public int data_len = 6;
 
 
 
         [ByteStreamParser(FieldType.Field_Ushort, FieldType.Field_Ushort_Len)]
         [ByteStreamClassConvertIgnoreFilter(filter_indicator_field = "data_len", filter_value = 0)]
-        public ushort content_identifier;
+        public ushort content_identifier=(ushort)PackageDataIdnetifier.Get_WorkStatus;
 
 
 
         [ByteStreamParser(FieldType.Field_Int, FieldType.Field_Int_Len)]
         [ByteStreamClassConvertIgnoreFilter(filter_indicator_field = "data_len", filter_value = 0)]
-        public int content_len;
+        public int content_len=0;
 
         /*
          * 数据内容对象
@@ -112,16 +113,27 @@ namespace Nuctech.NIS.Service.DeviceAccess.ETD
          * */
         public byte[] data_content;
 
-        public bool IsValid()
+        public static bool IsValid(ushort check_code, byte[] byffer)
         {
-			int n = _bBuf.Length / 2;
+			int n = byffer.Length / 2;
 			byte[] tmpByte = new byte[2];
 			for (int i = 0; i < n - 1; i++)
 			{
-				tmpByte[0] ^= _bBuf[2 * i];
-				tmpByte[1] ^= _bBuf[2 * i + 1];
+				tmpByte[0] ^= byffer[2 * i];
+				tmpByte[1] ^= byffer[2 * i + 1];
 			}
-			return xor_check_code == BitConverter.ToUInt16(tmpByte, 0);		
+			return check_code == BitConverter.ToUInt16(tmpByte, 0);		
+        }
+        public static ushort getChekcCode(byte[] byffer)
+        {
+			int n = byffer.Length / 2;
+			byte[] tmpByte = new byte[2];
+			for (int i = 0; i < n - 1; i++)
+			{
+				tmpByte[0] ^= byffer[2 * i];
+				tmpByte[1] ^= byffer[2 * i + 1];
+			}
+			return BitConverter.ToUInt16(tmpByte, 0);		
         }
     }
 

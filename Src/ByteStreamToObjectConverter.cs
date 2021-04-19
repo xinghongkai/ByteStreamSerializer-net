@@ -33,15 +33,60 @@ namespace Nuctech.NIS.ByteStream.Serializer
             PooledByteBufferAllocator pbba = new PooledByteBufferAllocator();
             IByteBuffer bf = pbba.CompositeBuffer();
 
-            SerializeInner(obj, bf);
+            try
+            {
+                SerializeInner(obj, bf);  
+            }    
+            catch(Exception ex)
+            {
+                bf.Release();
+                return null;
+            }
 
-                       
+
             return bf;
         }
 
-        private static void SerializeInner(object obj, IByteBuffer bf)
+        private static void SerializeInner(object byte_stream_obj, IByteBuffer nettybytes)
         {
+            Type byte_stream_type = byte_stream_obj.GetType();
+            object[] laAttributes = byte_stream_type.GetCustomAttributes(typeof(ByteStreamParserAttribute), false);
 
+
+            if (laAttributes == null && laAttributes.Count() <= 0)
+                return;
+
+
+            FieldInfo[] laFields =
+                byte_stream_type.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+
+
+
+
+            foreach (FieldInfo lofield in laFields)
+            {
+                object[] laFieldsAttributes = lofield.GetCustomAttributes(typeof(ByteStreamParserAttribute), false);
+
+                foreach (Attribute loAtt in laFieldsAttributes)
+                {
+                    ByteStreamParserAttribute loDefectTrack = (ByteStreamParserAttribute)loAtt;
+                    {
+                        if (loDefectTrack.FieldTypeName == FieldType.Field_Class)
+                        {
+
+                        }
+                        else if(loDefectTrack.FieldTypeName == FieldType.Field_String)
+                        {
+
+                        }
+                        else
+                        {
+                            object obj = lofield.GetValue(byte_stream_obj);
+                            WriteValueTypeValue(lofield.FieldType, nettybytes, obj);
+                        }
+                    }
+                }
+            }
         }
 
         private static void DeserializeInner(object byte_stream_obj, IByteBuffer nettybytes)
@@ -318,6 +363,25 @@ namespace Nuctech.NIS.ByteStream.Serializer
             else if (t.Equals(typeof(byte))) return nettybytes.ReadByte();
             else if (t.Equals(typeof(byte[]))) return nettybytes.ReadBytes((int)readlen);
             else return t.Assembly.CreateInstance(t.FullName);
+        }
+        private static void WriteValueTypeValue(Type t, IByteBuffer nettybytes, object o)
+        {
+            if (t.Equals(typeof(bool))) nettybytes.WriteBoolean((bool)o);
+            else if (t.Equals(typeof(short))) nettybytes.WriteShort((short)o);
+            else if (t.Equals(typeof(ushort))) nettybytes.WriteUnsignedShort((ushort)o);
+            else if (t.Equals(typeof(int))) nettybytes.WriteInt((int)o);
+            else if (t.Equals(typeof(uint)))
+            {
+                nettybytes.SetUnsignedInt(nettybytes.WriterIndex, (uint)o);
+                nettybytes.SetWriterIndex(nettybytes.WriterIndex + sizeof(uint));
+            }
+            else if (t.Equals(typeof(long))) nettybytes.WriteLong((long)o);
+            else if (t.Equals(typeof(ulong)))nettybytes.WriteLong((long)o); // Unsignedlong??
+            else if (t.Equals(typeof(float))) nettybytes.WriteFloat((float)o);
+            else if (t.Equals(typeof(double))) nettybytes.WriteDouble((double)o);
+            else if (t.Equals(typeof(byte))) nettybytes.WriteByte((byte)o);
+            else if (t.Equals(typeof(byte[]))) nettybytes.WriteBytes((byte[])o);
+            else { };
         }
 
         public static string ReplaceProWithValue(string regex, object o)
