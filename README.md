@@ -1,6 +1,10 @@
 # ByteStreamSerializer-net
 a tool to serialize &amp; deserialize custom tcp byte stream based on Attribute and Reflection
 
+# applied to Fields **NOT PROPERTIES**
+
+
+
 A Hello World Example
 
 
