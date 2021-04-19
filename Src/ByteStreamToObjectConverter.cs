@@ -22,6 +22,28 @@ namespace Nuctech.NIS.ByteStream.Serializer
             return byte_stream_obj;
         }
 
+        /// <summary>
+        /// Serialize目前只支持TR， 因为时间问题，不再过多研究
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static IByteBuffer Serialize<T>(object obj)
+        {
+            PooledByteBufferAllocator pbba = new PooledByteBufferAllocator();
+            IByteBuffer bf = pbba.CompositeBuffer();
+
+            SerializeInner(obj, bf);
+
+                       
+            return bf;
+        }
+
+        private static void SerializeInner(object obj, IByteBuffer bf)
+        {
+
+        }
+
         private static void DeserializeInner(object byte_stream_obj, IByteBuffer nettybytes)
         {
             Type byte_stream_type = byte_stream_obj.GetType();
@@ -116,7 +138,9 @@ namespace Nuctech.NIS.ByteStream.Serializer
                                                      * && pis.ElementAt(1).ParameterType.Equals(typeof(int))*/)
                                                 {
                                                     List<object> o = new List<object> { nettybytes, length };
-                                                    lofield.SetValue(byte_stream_obj, ci.Invoke(o.ToArray()));
+                                                    object obj = ci.Invoke(o.ToArray());
+                                                    DeserializeInner(obj, nettybytes);
+                                                    lofield.SetValue(byte_stream_obj, obj);
                                                 }
                                             }
                                         }
@@ -149,7 +173,9 @@ namespace Nuctech.NIS.ByteStream.Serializer
                                             pis.ElementAt(1).ParameterType.FullName.Equals(typeof(int).FullName)*/)
                                         {
                                             List<object> o = new List<object> { nettybytes, length };
-                                            lofield.SetValue(byte_stream_obj, ci.Invoke(o.ToArray()));
+                                            object obj = ci.Invoke(o.ToArray());
+                                            DeserializeInner(obj, nettybytes);
+                                            lofield.SetValue(byte_stream_obj, obj);
                                         }
                                     }
                                 }
@@ -319,8 +345,6 @@ namespace Nuctech.NIS.ByteStream.Serializer
             }
             return regex;
         }
-
-
 
         private static string ParseField(string propertyname, object o)
         {
