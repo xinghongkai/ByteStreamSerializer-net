@@ -5,8 +5,9 @@ A Hello World Example
 
 
 # 1, define a byte stream
-     head                result    
-  int - 4bytes         bool - 1byte
+        head                result    
+         4B                  1B
+         int                 bool   
 # 2, define a class
 ~~~
 pulic class HelloWorld
